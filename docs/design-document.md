@@ -192,7 +192,7 @@ Host system sends the building block the following information in rules.json:
 ```json
 {
 	"contract": "CONTRACT_ID",
-    "consent": "CONSENT_ID",
+	"consent": "CONSENT_ID",
 	"services": [
 		"service 1 - consent 1 definition",
 		"service 2 - consent 1 definition",
@@ -223,16 +223,17 @@ Depending on the rules.json, the BB appplies the appropriate endpoints to retrie
 BB displays the following json in an interactive and user friendly frame, through the JavaScript web component:
 
 ```json
-{  "url": "Link to the job post.",
-   "author": "Name of the job portal the job is posted to.",
-   "language": "Language of the job post.",
-   "title": "Title of the job post.",
-   "description": "Full description of the job post.",
-    "city": "City of job post.",
-    "time": "Date and time the job is posted.",
-    "score": "Scoring index of the job recommendation.",
-   "reasoning": ["Matching skill 1", "Matching skill 2", "Matching skill 3"],
-    "missing_skills": ["Missing skill 1", "Missing skill 2", "Missing skill 3"]
+{
+	"url": "Link to the job post.",
+	"author": "Name of the job portal the job is posted to.",
+	"language": "Language of the job post.",
+	"title": "Title of the job post.",
+	"description": "Full description of the job post.",
+	"city": "City of job post.",
+	"time": "Date and time the job is posted.",
+	"score": "Scoring index of the job recommendation.",
+	"reasoning": ["Matching skill 1", "Matching skill 2", "Matching skill 3"],
+	"missing_skills": ["Missing skill 1", "Missing skill 2", "Missing skill 3"]
 }
 ```
 
@@ -244,17 +245,20 @@ BB displays the following json in an interactive and user friendly frame, throug
 
 ```json
 {
-   "code": "Course code.",
-   "url": "Link to the course.",
-   "title": "Course title.",
-   "short_description": "Short description of the course.",
-   "explanation": "Skills you have: x,y,z. Skills you will get: w, z, t.",
-   "new_skills": ["New skill 1", "New skill 2", "New skill 3"],
-    "existing_skills": ["Existing skill 1", "Exsiting skill 2", "Existing skill 3"],
-    "interests": ["Interest 1", "Interest 2"],
-    "quality_index": "Quality index of the training recommendation.",
-    "scoring_index": "Scoring index of the tarining recommendation."
-
+	"code": "Course code.",
+	"url": "Link to the course.",
+	"title": "Course title.",
+	"short_description": "Short description of the course.",
+	"explanation": "Skills you have: x,y,z. Skills you will get: w, z, t.",
+	"new_skills": ["New skill 1", "New skill 2", "New skill 3"],
+	"existing_skills": [
+		"Existing skill 1",
+		"Exsiting skill 2",
+		"Existing skill 3"
+	],
+	"interests": ["Interest 1", "Interest 2"],
+	"quality_index": "Quality index of the training recommendation.",
+	"scoring_index": "Scoring index of the tarining recommendation."
 }
 ```
 
