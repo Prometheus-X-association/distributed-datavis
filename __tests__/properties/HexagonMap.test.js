@@ -108,7 +108,7 @@ function main(){
         // WordMap
         hideNumber: true,
         figSize: 44,
-        showZoomButtons: false,
+        showZoomButtons: true,
         mouseOver: false,
         showActionButtons: false,
 

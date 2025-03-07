@@ -8,6 +8,7 @@ const groups = require('./groups');
 const ResponsiveUtils = require('./responsive.utils');
 const VisualizationSeries = require('./groups/VisualizationSeries');
 const builder = require('./builder');
+const legends = require('./legends');
 
 const visualizers = {
     axis,
@@ -19,6 +20,7 @@ const visualizers = {
     responsive: ResponsiveUtils,
     VisualizationSeries,
     builder,
+    legends,
 }
 
 module.exports = visualizers;

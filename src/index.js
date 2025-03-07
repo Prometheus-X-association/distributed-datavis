@@ -6,7 +6,7 @@ import properties from "./properties";
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../node_modules/font-awesome/css/font-awesome.min.css';
 
-const version = '0.2.4';
+const version = '0.2.5';
 
 export {
     version,

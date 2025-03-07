@@ -123,6 +123,30 @@ Example:
 }
 ```
 
+Example:
+
+```json
+{
+    "data":{
+        "nodes":[
+            {"id":1, "label":"Monkey", "group":1},
+            {"id":1, "label":"Panda", "group":1},
+            {"id":1, "label":"Bambu", "group":2},
+        ],
+
+        "edges":[
+            {"from":1, "to":2},
+            {"from":2, "to":3},
+        ],
+
+        "legends":{
+            "1":"Animals",
+            "2":"Plants"
+        }
+    }
+}
+```
+
 ## Standard Data Format for Courses
 
 The attribute names for courses can be defined using two different standard cases: underscore_case and camelCase.

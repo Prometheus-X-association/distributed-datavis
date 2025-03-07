@@ -392,23 +392,17 @@ All the parameters that can be passed via URL to the component are described in 
 
 ## Test specification
 
-This document outlines the test plan for the Distributed data Visualization, subject to the specific attributes as follows:
-
-1. **No any part of the Headai's existing testing system shall be released or transferred as a part of this building block.**
-2. **All implementation work of the Headai's existing testing system is the intellectual property of Headai and is proprietary.**
-3. **No any source of the Headai's existing testing system is to be released under any circumstances.**
-
 ### Test plan
 
 The objective of testing the "Distributed Data Visualization" function is two-fold:
 
-1. To verify that it accurately builds a knowledge graph based on the given parameters, ensuring that the output is correct, reliable, and efficient over varying conditions.
+1. To verify that it accurately builds a visualization based on the given parameters, ensuring that the output is correct, reliable, and efficient over varying conditions.
 
 2. To confirm that the Distributed Data Visualization accurately represents the data provided by the JSON URLs. This involves verifying that all nodes, connections, and groups in the visualization correctly correspond to the data structure and content specified in the JSON file.
 
 Scope of Functional Tests includes:
 
-- Rendering of visualizations based on JSON data from Headai APIs.
+- Rendering of visualizations based on JSON data.
 - Full-screen mode functionality and its impact on user experience.
 - User interactions with the visualization, including zooming, focusing on nodes, and click actions.
 - Color coding and scaling to accurately represent different groups within the data.
@@ -422,7 +416,7 @@ Resulting users can effectively interact with and derive insights from visualize
 
 This test plan outlines a comprehensive approach combining black box testing methodologies with automated testing routines to ensure functional accuracy, performance under various conditions, optimal response times, and resilience against anomalies in the system. The strategy leverages industry-standard tools and methodologies to achieve a high level of software quality and reliability.
 
-Objectives for the current approach which combines best methodologies from Black Box testing implemented using homegrown Headai Quality Assurance Framework for AI. Using this approach it is possible to achieve the following:
+Using this approach it is possible to achieve the following:
 
 - Validate the accuracy of the application's outputs against defined functional requirements.
 - Ensure the application performs consistently under different load conditions.
@@ -433,7 +427,7 @@ Objectives for the current approach which combines best methodologies from Black
 
 Black Box Testing: This approach focuses on testing software functionality without knowledge of the internal workings. Test cases will be derived from functional specifications to verify the correctness of output based on varied inputs. This method effectively simulates user interactions and scenarios.
 
-Automated Testing Routines: Automating the execution of repetitive but essential test cases ensures comprehensive coverage, consistency in test execution, and efficient use of resources. Automated tests will be scheduled to run at regular intervals, ensuring continuous validation of the application's functionality and performance.
+Automated Testing Routines: Automating the execution of repetitive but essential test cases ensures comprehensive coverage, consistency in test execution, and efficient use of resources.
 
 **Introduction of the tools used**
 
@@ -454,108 +448,15 @@ A comprehensive evaluation of the Distributed Data Visualization's functionality
 
 ### Unit tests
 
-**Test Cases**
-
-| Test Case ID | TC001 |
-| --- | --- |
-| Description | Validate successful visualization rendering from a valid JSON URL. |
-| Inputs | json_url=&lt;valid_url&gt;, iframe=false |
-| Expected Result | Visualization is correctly rendered based on the JSON data. Pass if the visualization matches the JSON data structure; fail otherwise. |
-| Actual Outcome |  |
-| Status |  |
-| Comments |  |
-
-| Test Case ID | TC002 |
-| --- | --- |
-| Description | Test Full-Screen Mode functionality for IFrame embedding. |
-| Inputs | json_url=&lt;valid_url&gt;, iframe=true |
-| Expected Result | Visualization is rendered in full-screen mode within an IFrame. Pass if the visualization occupies the full screen of the IFrame; fail if it does not. |
-| Actual Outcome |  |
-| Status |  |
-| Comments |  |
-
-| Test Case ID | TC003 |
-| --- | --- |
-| Description | Verify the functionality of initial zoom and camera focus. |
-| Inputs | json_url=&lt;valid_url&gt;, initial_zoom=1.0, center_camera_around=&lt;node_id&gt; |
-| Expected Result | Camera is zoomed to "human readable" size focusing on the specified node. Pass if the initial view focuses and zooms as expected; fail otherwise. |
-| Actual Outcome |  |
-| Status |  |
-| Comments |  |
-
-| Test Case ID | TC004 |
-| --- | --- |
-| Description | Check color coding functionality with custom colors for groups. |
-| Inputs | json_url=&lt;valid_url&gt;, colors=A0A000,F000F0 |
-| Expected Result | Visualization uses the specified colors to differentiate between two groups. Pass if groups are correctly colored; fail if default or incorrect colors are used. |
-| Actual Outcome |  |
-| Status |  |
-| Comments |  |
-
-| Test Case ID | TC005 |
-| --- | --- |
-| Description | Test filtering nodes by minimum weight. |
-| Inputs | json_url=&lt;valid_url&gt;, filter_min_weight=3 |
-| Expected Result | Only nodes with weight >= 3 are displayed. Pass if visualization correctly filters nodes; fail if nodes with weight < 3 are displayed. |
-| Actual Outcome |  |
-| Status |  |
-| Comments |  |
-
-| Test Case ID | TC006 |
-| --- | --- |
-| Description | Ensure click actions show the neighborhood of a clicked node. |
-| Inputs | json_url=&lt;valid_url&gt;, click_action=highlight |
-| Expected Result | Clicking a node highlights its neighborhood. Pass if the neighborhood is highlighted upon clicking; fail if no action occurs or the behavior is incorrect. |
-| Actual Outcome |  |
-| Status |  |
-| Comments |  |
-
-| Test Case ID | TC007 |
-| --- | --- |
-| Description | Verify error handling for unsupported word_type input. |
-| Inputs | word_type=abc. |
-| Expected Result | An appropriate error message indicating the unsupported word_type. Fail if not failing is happening. |
-| Actual Outcome |  |
-| Status |  |
-| Comments |  |
-
-| Test Case ID | TC008 |
-| --- | --- |
-| Description | Test performance under high load by concurrently executing multiple requests. |
-| Inputs | Multiple requests using valid parameters. |
-| Expected Result | The function maintains performance and accuracy across all requests. Pass if rendering is done correctly and within a reasonable time frame; fail otherwise. |
-| Actual Outcome |  |
-| Status |  |
-| Comments |  |
-
-| Test Case ID | TC009 |
-| --- | --- |
-| Description | Check for the functionality with all parameters filled, including optional ones. |
-| Inputs | All parameters specified, including optional ones with valid data. |
-| Expected Result | A detailed knowledge graph is rendered that matches all specified criteria; fail otherwise. |
-| Actual Outcome |  |
-| Status |  |
-| Comments |  |
-
-**Acceptance Criteria**
-
-- Correct Visualization: For all test cases, the primary acceptance criterion is that the visualization accurately represents the data provided by the JSON URL (TC001).
-- Functionality: Each feature (TC002, TC003, TC004) must work as specified in the input parameters for the test to pass.
-- Performance: Visualizations should load within a reasonable time frame, without significant delays or performance issues, especially when testing with larger JSON files or higher complexity (evaluated across all test cases).
-- Usability: The visualization must be user-friendly and interactive, allowing users to easily understand and explore the visualized data (TC002, TC003, TC006).
-- The rendered must gracefully handle errors (TC007), providing clear and actionable error messages.
+You can find details about the unit tests in this [link](./tests/UnitTests.md).
 
 ### Component-level testing
 
-Al the Unit Tests are done in order to make sure Distributed Data visualisation is integrateable via HTTPS requests and via REST-API requests.
- from both the organization and the individual
-Such test should be done also when intergrating DDV into a host system. All the stest could be done with same tools introduced in Unit Test section (e.g. Postman).
+The Distributed Data Visualizer does not integrate its funcionalities with the Dataspace connector or with other Building Blocks in a direct way. For this reason, Component-level tests will be empty.
 
-### UI test
+### UI tests
 
-Al the Unit Tests are done in order to make sure Distributed Data visualisation UI would work unders decribed conditions and environments (e.g. latest Mozilla Firefox)
-
-Such test should be done also when intergrating DDV into a host system. All the stest could be done with same tools introduced in Unit Test section (e.g. Selenium).
+You can find details about the UI tests in this [link](./tests/UI_Tests.md).
 
 ### Partnerships & Roles
 

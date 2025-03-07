@@ -7,6 +7,11 @@ v0.3.0 (Next Release)
 * More detailed guides and documentation of each class
 * Linechart Visualizer implemented.
 
+v0.2.5
+* BugFix: Action buttons were not visible during group selection.
+* Implemented documentation for UI tests and Unitary tests
+* Re-structured testing section in the design document.
+
 v0.2.4 (18/02/2025)
 * Defined basic structure for automatized tests.
 * BugFix: Error when initial properties had invalid values.

@@ -11,7 +11,7 @@ class WordMap extends SvgVisualization {
         enableZoom: true,
         hideNumber: true,
         figSize: 50,
-        showZoomButtons: true,
+        showZoomButtons: false,
         mouseOver: true,
         defaultCamera: true,
         showActionButtons: true,
@@ -102,7 +102,7 @@ class WordMap extends SvgVisualization {
             props.hideNumber = false;
         }
 
-        this._initColorIndices();
+        //this._initColorIndices();
         
         if (props.hasOwnProperty('colors')) this._initColorIndices();
 

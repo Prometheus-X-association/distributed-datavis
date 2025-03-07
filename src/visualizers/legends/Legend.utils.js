@@ -43,7 +43,7 @@ function initButtonsLegend(plot) {
     } = plot.getProperties();
 
     if (legends == null || Array.isArray(legends)) return;
-    const groups = Object.keys(plot._groupToColorIndex);
+    const groups = Object.keys(plot._legends);
 
     const { innerSVG, legendContainer } = plot.components;
     var legendFontSize = fontSize + 2;
@@ -63,6 +63,8 @@ function initButtonsLegend(plot) {
             .join('g')
             .attr('class', 'legendSelectButton')
             .attr('transform', (d, i) => `translate(0,${i * (legendSquareSize + spaceBetweenLegends)})`);
+
+        if (g.selectAll('rect').size() > 0) return;
 
         g.append('rect')
             .attr('x', -legendSquareSize)
@@ -106,7 +108,7 @@ function initLegend(plot) {
 
     const legends = plot._legends;
     if (legends == null || Array.isArray(legends)) return;
-    const groups = Object.keys(plot._groupToColorIndex);
+    const groups = Object.keys(plot._legends);
 
     var legendFontSize = fontSize + 2;
 
@@ -115,7 +117,7 @@ function initLegend(plot) {
 
     const legendContainer = outerSVG.selectAll('g.legend').data([null]).enter().append('g').attr('class', 'legend');
 
-    plot.components.legendContainer = legendContainer;
+    plot.components.legendContainer = outerSVG.select('g.legend');
 
     if (plot.properties.hideLegend === true) {
         legendContainer.style('display', 'none');
@@ -178,8 +180,7 @@ function initLegend(plot) {
         .attr('height', legendHeight)
         .attr('width', legendWidth);
 
-    const constructors = ['HexagonMap', 'SquareMap'];
-    if (constructors.includes(plot.constructor.name)) initButtonsLegend(plot);
+    initButtonsLegend(plot);
 
 }
 

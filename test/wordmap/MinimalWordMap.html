@@ -1,0 +1,67 @@
+<script src="http://localhost:8080/ptx-ddv.js"></script>
+
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src='https://d3js.org/d3-hexbin.v0.2.min.js'></script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<div id="mindmap"></div>
+
+<script>
+    const minimalGraph = {
+        data: {
+            nodes: [
+                {id:10, label:"zebra", value:20, group:2,},
+                {id:11, label:"horse", value:110, group:1},
+                {id:12, label:"mammal", value:150, group:1},
+                {id:14, label:"monkey", value:60, group:1},
+                {id:15, label:"dolphin", value:40, group:1},
+                {id:16, label:"whale", value:30 , group:1},
+                {id:17, label:"bear", value:40, group:1},
+                {id:18, label:"panda", value:125, group:1},
+                {id:20, label:"wolf", value:65, group:1},
+                {id:21, label:"human", value:12, group:2},
+                {id:22, label:"dog", value:18, group:2},
+                {id:50, label:"bambu",value:10, group:3}
+            ],
+
+            edges: [
+                {from:12, to:10},{from:10, to:12},
+                {from:12, to:11},{from:11,to:12},
+                {from:12, to:14},{from:14,to:12},
+                {from:12, to:15},{from:15,to:12},
+                {from:12, to:16},{from:16,to:12},
+                {from:12, to:17},{from:17,to:12},
+                {from:12, to:18},{from:18,to:12},
+                {from:12, to:20},{from:20,to:12},
+                {from:12, to:21},{from:21,to:12},
+                {from:12, to:22},{from:22,to:12},
+
+                {from:10, to:14},{from:14,to:10},
+                {from:17, to:18},{from:18,to:17},
+                {from:14, to:21},{from:21,to:14},
+                {from:20, to:22},{from:22,to:20},
+                {from:11, to:10},{from:10,to:11},
+                {from:15, to:16},{from:16,to:15},
+
+                {from:18,to:50},{from:50,to:18}
+            ],
+
+            legends: {
+                "1":"Group 1",
+                "2":"Group 2",
+                "3":"Group 3",
+            }
+        }
+    };
+
+    const plotType = 'hexagon';
+    const props = {width:1200,height:800,margin:{top:20,bottom:20,left:20,right:20}};
+    plot = ddv.visualizers.wordmap.buildWordMap(minimalGraph, plotType, props);
+    plot.attachOn('div#mindmap');
+    ddv.visualizers.responsive.enableResponsiveness(plot);
+</script>
