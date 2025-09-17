@@ -27,6 +27,9 @@ class WordMap extends SvgVisualization {
         strokeWidth: 3,
         strokeColor: '#000000',
         hasCustomColors: false,
+        filterGroups: [],
+        highlightNewGroups: false,
+        highlightNeighbors: null,
     }
 
     static rulesProperties = {
@@ -45,6 +48,9 @@ class WordMap extends SvgVisualization {
         strokeWidth: {type:'number'},
         strokeColor: {type:'string'},
         hasCustomColors: {type:'boolean'},
+        filterGroups: {type:'array',subtype:'number'},
+        highlightNewGroups: {type:'boolean'},
+        highlightNeighbors: {type:'string'},
     }
 
     // Initialize Attributes
@@ -123,7 +129,6 @@ class WordMap extends SvgVisualization {
         interaction.changeOnClickAction(this, this.properties.actionOnClick);
 
         if (requiresDataRefresh === true) {
-            console.log('REFRESHING DATA');
             this.refreshData();
             return;
         } else {
@@ -144,6 +149,8 @@ class WordMap extends SvgVisualization {
         // necessary to convert them always
         groups.forEach(d => groupsInt.push(Number.parseInt(d)));
         const sortedGroups = groupsInt.sort(function (a, b) { return a - b });
+        const extraColorMaping = this.digitalTwin.properties.extraColorMaping;
+
         for (var i = 0; i < sortedGroups.length; i++) {
             const group = sortedGroups[i];
             this._groupToColorIndex[group] = i;
@@ -152,6 +159,9 @@ class WordMap extends SvgVisualization {
                 var color = Math.floor(Math.random() * 16777216).toString(16);
                 var color = '#000000'.slice(0, - color.length) + color;
                 colors.push(color);
+            }
+            if (typeof(extraColorMaping[group]) == 'string'){
+                colors[i] = extraColorMaping[group]
             }
         }
     }
@@ -165,6 +175,7 @@ class WordMap extends SvgVisualization {
 
     getColor(group) {
         const { colors } = this.properties;
+        if (Array.isArray(group) && group.length > 0) group = group[0];
         const groupAlreadyRegistered = this._groupToColorIndex.hasOwnProperty(group);
         const index = Object.keys(this._groupToColorIndex).length;
         const needsMoreColors = index > colors.length;
@@ -274,7 +285,7 @@ class WordMap extends SvgVisualization {
     getStorableComponent() {
         if (this.graphToMap != null) {
             var recenteredNodes = this.graphToMap.getLocatedNodes();
-            this.plot(recenteredNodes);
+            this.draw(recenteredNodes);
         } else {
             this.refresh();
         }
@@ -340,17 +351,49 @@ class WordMap extends SvgVisualization {
             const path = d3.select(this).datum(nodeInfo).select('path').datum((d)=>d);
 
             path.attr('fill', ()=>{
+                const nodeGroup = nodeInfo[categoryField];
                 var value = This._scaleValue(nodeInfo['value']);
                 var percentBrightness = VisualUtils.scaleBrightness(value, maxValue);
                 var percentBrightness = Math.max(percentBrightness, 0);
-                var color = This.getColor(nodeInfo[categoryField]),
-                color = VisualUtils.increaseBrightness(color, percentBrightness);
+                var color = This.getColor(nodeGroup);
+                // If groups is not in list of groups to highlight, then it fades the color based on the value
+                if (!This.digitalTwin.properties.newGroups.includes(nodeGroup)){
+                    color = VisualUtils.increaseBrightness(color, percentBrightness);
+                }
                 return color;
             });
         });
     }
 
-    _highlightNode(nodeId) {
+    _highlightNewGroups(){
+        const nodes = this.getData();
+        const newGroups = this.digitalTwin.properties.newGroups;
+        if (newGroups.length == 0) return;
+        const ids = [];
+        for (let i = 0; i < nodes.length; i++) {
+            const id = nodes[i]['id'];
+            const group = nodes[i]['group'];
+            if (newGroups.includes(group)) ids.push(id);
+        }
+        this._unHighlightAllNodes();
+        this._highlightListOfNodes(ids);
+        this.properties.mouseOver = false;
+        this.properties.actionOnClick = 'none';
+        interaction._highlightActionButton(this);
+    }
+
+    _highlightNeighbors(nodeLabel){
+        const node = this.digitalTwin.getNodeInfoByLabel(nodeLabel);
+        if (node == null) return;
+
+        this._unHighlightAllNodes();
+        this._highlightNode(node['id']);
+        this.properties.mouseOver = false;
+        this.properties.actionOnClick = 'none';
+        interaction._highlightActionButton(this);
+    }
+
+    _highlightNode(nodeId){
         if (nodeId == null) return;
         if (this.graphToMap == null) return;
         const nodeInfo = this.digitalTwin.getNodeInfoById(nodeId);
@@ -372,6 +415,16 @@ class WordMap extends SvgVisualization {
         const newPlotData = this.graphToMap.getLocatedNodes();
         this.setData(newPlotData);
         this.refresh();
+    }
+
+    refresh(){
+        super.refresh();
+        const { 
+            highlightNewGroups,
+            highlightNeighbors,
+        } = this.properties;
+        if (highlightNewGroups) this._highlightNewGroups();
+        this._highlightNeighbors(highlightNeighbors);
     }
 
     removeListOfElementsByName(listOfElements) {

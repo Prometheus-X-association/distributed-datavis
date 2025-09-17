@@ -6,7 +6,6 @@ function showValuesOnClick(event,plot){
     if (plot.tooltipSubPlot == null) return;
     var nodeId = getNodeIdFromEvent(event);
     var nodeInfo = plot.graphToMap.digitalTwin.getNodeInfoById(nodeId);
-    console.log({nodeId,nodeInfo})
     const valuesField = 'values';
     const {nameField} = plot.getProperties();
 

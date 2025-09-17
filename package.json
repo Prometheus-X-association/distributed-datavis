@@ -17,8 +17,8 @@
     "webpack-dev-server": "^5.1.0"
   },
   "scripts": {
-    "build": "webpack build --mode=production --target=node",
-    "devBuild": "webpack build --mode=development --target=node",
+    "build": "webpack build --mode=production",
+    "devBuild": "webpack build --mode=development",
     "test": "jest"
   },
   "dependencies": {

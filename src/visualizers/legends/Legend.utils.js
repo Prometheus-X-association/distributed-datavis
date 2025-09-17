@@ -217,15 +217,19 @@ function preprocessLegend(props, json){
 
 function getGroups(nodes, categoryField){
     categoryField = categoryField || 'group';
-    var groups = [];
+    var allGroups = [];
 
     for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
-        const group = node[categoryField];
-        if (!groups.includes(group)) groups.push(group)
+        var groups = node[categoryField];
+        if (!Array.isArray(groups)) groups = [groups];
+        for (let j = 0; j < groups.length; j++) {
+            const group = groups[j];
+            if (!allGroups.includes(group)) allGroups.push(group)
+        }
     }
-    groups = groups.sort();
-    return groups;
+    allGroups = allGroups.sort();
+    return allGroups;
 }
 
 const LegendUtils = {

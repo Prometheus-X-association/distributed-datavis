@@ -1,3 +1,4 @@
+import colors from "../../data/digitalTwin/colors";
 import { LineChart } from "../axis";
 import Tooltip from "../tooltip/Tooltip";
 import HexagonMap from "./HexagonMap";
@@ -19,12 +20,23 @@ export class HexagonMapWithTimeSeries extends HexagonMap {
     }
 
     draw(data){
-        //colors.configureMapWithTimeSeries(this);
+        if (this.hasSignals() == true){
+            colors.configureMapWithSignals(this);
+            this.properties.colorScale = 'flat';
+        }
+
         const timeLabels = this.digitalTwin.originalData.info.timeLabels;
         super.draw(data, timeLabels);
         var tooltipProps = {timeLabels};
         this.setTooltipProperties(tooltipProps);
         this.enableLinechartTooltip();
+    }
+
+    hasSignals(){
+        var has = (this.digitalTwin.originalData.legends[1] == 'Emerging') && (
+            this.digitalTwin.originalData.legends[2] == 'Constantly Increasing'
+        );
+        return has;
     }
 
     enableLinechartTooltip() {

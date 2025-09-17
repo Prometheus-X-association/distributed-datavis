@@ -1,5 +1,6 @@
 const ObjectWithProperties = require("../../properties/ObjectWithProperties");
 const SkillsUtils = require("../skills.utils");
+const { getDefaultColors } = require("./colors");
 const DigitalTwinProcessing = require("./DigitalTwinProcessing");
 const shrink = require("./shrink");
 
@@ -28,6 +29,9 @@ getNodeInfoByLabel(label)
         valueField: 'value',
         hideNodes: [],
         subgraph: null,
+        extraColorMaping: {},
+        newGroups: [],
+        colors: [],
     }
 
     static rulesProperties = {
@@ -39,6 +43,9 @@ getNodeInfoByLabel(label)
         valueField: {type:'string'},
         hideNodes: {type:'array', subtype:'string'},
         subgraph: {type:'string'},
+        extraColorMaping: {type:'dictionary', subtype:'string'},
+        newGroups: {type:'array', subtype:'number'},
+        colors: {type:'array', subtype:'string'},
     }
 
     defineSetters(){
@@ -48,7 +55,9 @@ getNodeInfoByLabel(label)
 
     constructor(json, props){
         super(props);
-        this.originalData = JSON.parse(JSON.stringify(json));
+        const originalData = JSON.parse(JSON.stringify(json));
+        this._processSources(originalData);
+        this.originalData = originalData;
 
         this._nodes = [];
         this._edges = [];
@@ -56,9 +65,9 @@ getNodeInfoByLabel(label)
         this._idToIndex = {};
         this._labelToIndex = {};
 
-        const { valueField } = this.properties;
+        const { valueField, colorNodes, colorNeighbors } = this.properties;
 
-        const { nodes , edges } = this.getOriginalData();
+        const { nodes , edges, sources } = this.getOriginalData();
         const sortedNodes = DigitalTwinProcessing.sortArrayOfObjects(nodes,valueField);
         const sortedEdges = DigitalTwinProcessing.sortArrayOfObjects(edges,valueField);
         this.#modifyOriginalData({
@@ -66,7 +75,13 @@ getNodeInfoByLabel(label)
             edges: sortedEdges,
         });
 
+        this._nodes = nodes;
+        this._processNodes(nodes);
+        this._colorNodes(colorNodes);
+        this._colorNeighbors(colorNeighbors);
+
         this._processData();
+
         this.nodesHaveRelations = DigitalTwinProcessing.doNodesHaveRelations(sortedNodes);
     }
 
@@ -112,14 +127,14 @@ getNodeInfoByLabel(label)
         }
         
         const title = original.title;
-        const nodes = data.nodes;
-        const edges = data.edges;
-        const legends = data.legends;
+        const { 
+            nodes , edges , sources , legends ,
+            indicators ,
+        } = data;
         const uniqueIdentifier = data.unique_identifier;
-        const indicators = data.indicators;
 
         return {
-            title, 
+            title, sources,
             nodes, edges, legends, uniqueIdentifier, indicators,
         };
     }
@@ -144,6 +159,20 @@ getNodeInfoByLabel(label)
         const neighborList = neighbors[id];
         if (neighborList == null) return [];
         return neighborList;
+    }
+
+    getSources(id){
+        const node = this.getNodeInfoById(id);
+        if (node == null) return [];
+        const { sources } = node;
+        const expandedSources = [];
+        for (let i = 0; i < sources.length; i++) {
+            const sourceId = sources[i];
+            const source = this._sources[sourceId];
+            if (source == null) continue;
+            expandedSources.push(source);
+        }
+        return expandedSources;
     }
 
     getNeighborsByLabel(label){
@@ -197,38 +226,114 @@ getNodeInfoByLabel(label)
         this._processData();
     }
 
-    _processData(){
-        this._neighbors = {};
+    // Get Maximum group
+    getMaxGroup(){
+        const originalData = this.getOriginalData();
+        if (originalData == null) return;
+        var {nodes} = originalData;
+        if (nodes.length == 0) return;
+        var maxGroup = Number.parseFloat(nodes[0]['group'])
+
+        for (let i = 0; i < nodes.length; i++) {
+            var group = nodes[i]['group'];
+            group = Number.parseFloat(group);
+            if (group > maxGroup) maxGroup = group;
+        }
+        return maxGroup;
+    }
+
+    // Clasifies certain nodes in the map under a new group
+    _colorNeighbors(coloringRule){
+        if (typeof(coloringRule) != 'string') return;
+        const pieces = coloringRule.split(',');
+        if (pieces.length == 0) return;
+
+        var currentColor = null;
+        var currentGroup = this.getMaxGroup();
+        var colors = null
+        if (this.properties.colors.length >= currentGroup){
+            colors = this.properties.colors;
+        } else {
+            colors = getDefaultColors(currentGroup);
+        }
+        
+        for (let i = 1; i <= currentGroup; i++) {
+            this.properties.extraColorMaping[i] = colors[i-1];
+        }
+
+        const defaultColor = getDefaultColors(1)[0];
+
+        for (let i = 0; i < pieces.length; i++) {
+            var piece = pieces[i].trim();
+            if (piece == '#000000') piece = defaultColor;
+            if (piece.startsWith('#')){
+                currentGroup += 1;
+                currentColor = piece;
+                this.properties.extraColorMaping[currentGroup] = currentColor;
+                this.properties.newGroups.push(currentGroup);
+                continue;
+            }
+            
+            const label = SkillsUtils.normalizeSkill(piece);
+            const node = this.getNodeInfoByLabel(label);
+            if (node == null) continue;
+
+            const nodeId = node['id'];
+            const edges = this.getOriginalData().edges;
+            for (let i = 0; i < edges.length; i++) {
+                const edge = edges[i];
+                if (edge['from'] == nodeId){
+                    var neighbor = this.getNodeInfoById(edge['to']);
+                    if (neighbor == null) continue;
+                    neighbor['group'] = currentGroup;
+                    
+                } else if (edge['to'] == nodeId){
+                    var neighbor = this.getNodeInfoById(edge['from']);
+                    if (neighbor == null) continue;
+                    neighbor['group'] = currentGroup;
+                }
+            }
+        }
+    }
+
+    // Clasifies certain nodes in the map under a new group
+    _colorNodes(coloringRule){
+        if (typeof(coloringRule) != 'string') return;
+        const pieces = coloringRule.split(',');
+        if (pieces.length == 0) return;
+
+        var currentColor = null;
+        var currentGroup = this.getMaxGroup();
+
+        const colors = getDefaultColors(currentGroup);
+        for (let i = 1; i <= currentGroup; i++) {
+            this.properties.extraColorMaping[i] = colors[i-1];
+        }
+
+        const defaultColor = getDefaultColors(1)[0];
+
+        for (let i = 0; i < pieces.length; i++) {
+            var piece = pieces[i].trim();
+            if (piece == '#000000') piece = defaultColor;
+            if (piece.startsWith('#')){
+                currentGroup += 1;
+                currentColor = piece;
+                this.properties.extraColorMaping[currentGroup] = currentColor;
+                this.properties.newGroups.push(currentGroup);
+                continue;
+            }
+            
+            const label = SkillsUtils.normalizeSkill(piece);
+            const node = this.getNodeInfoByLabel(label);
+            if (node == null) continue;
+            node['group'] = currentGroup;
+        }
+    }
+
+    _processNodes(nodes){
         this._idToIndex = {};
         this._labelToIndex = {};
 
-        const originalData = this.getOriginalData();
-        if (originalData == null) return;
-
-        /**/
-        var {nodes} = originalData;
-        const { maxNodes , subgraph } = this.getProperties();
-
-        const subgraphId = nodes.find((d)=>d.label == subgraph)?.id;
-        const subgraphIsActive = (subgraphId != null);
-
-        const willCalculateFilters = typeof(maxNodes) == 'number' && Array.isArray(nodes) && nodes.length > 0 && !subgraphIsActive;
-
-        if (willCalculateFilters){
-            const {minWeight, minValue, count} = shrink.findOptimalFilters(nodes, maxNodes);
-            if (count != null) console.log(`Map Shrink: Nodes:'${count}', MinWeight:'${minWeight}', MinValue:'${minValue}'`);
-            this.properties.filterMinWeight = minWeight;
-            this.properties.filterMinValue = minValue;
-        }
-        /**/
-
-        var {nodes,edges} = this.#filterData();
-
-        this._nodes = nodes;
-        this._edges = edges;
-
-        this.#processNeighbors();
-        
         // IdToIndex and LabelToIndex
         for (let i = 0; i < nodes.length; i++) {
             const id = nodes[i].id;
@@ -238,6 +343,90 @@ getNodeInfoByLabel(label)
             if (this.hasLabel(label)) continue;
             this._labelToIndex[label] = i;
         }
+    }
+
+    _processSources(originalData){
+        const sources = originalData?.data?.sources || originalData?.sources;
+        this._sources = {};
+        const allSources = this._sources;
+
+        // If has latest source format skip computation
+        if (Array.isArray(sources)){
+            for (let i = 0; i < sources.length; i++) {
+                const sourceId = sources[i]['id'];
+                allSources[sourceId] = sources[i];
+            }
+            return;
+        }
+
+        const nodes = originalData?.data?.nodes || originalData?.nodes || [];
+
+        const sourceContentToId = {};
+        var nextSourceId = 0;
+
+        for (let i = 0; i < nodes.length; i++) {
+            const { sources } = nodes[i];
+            if (typeof(sources) === 'number') continue;
+            if (!Array.isArray(sources)){  // Data validation
+                nodes[i].sources = [];
+                continue;
+            }
+
+            for (let j = 0; j < sources.length; j++) {
+                const source = sources[j];
+                
+                const sourceContent = source.title.trim() + source.url.trim();
+                var sourceId = sourceContentToId[sourceContent];
+
+                // If source has not been registered before, add it to the register and increment sourceId by 1
+                if (sourceId === undefined){
+                    sourceId = nextSourceId;
+                    sourceContentToId[sourceContent] = nextSourceId;
+                    source.id = sourceId; // Add id to source content
+                    nextSourceId += 1;
+                    allSources[sourceId] = source;
+                }
+
+                sources[j] = sourceId; // Replaces the source inside the node for its id
+            }
+        }
+    }
+
+    _processData(){
+        this._neighbors = {};
+        this._idToIndex = {};
+        this._idToIndex = {};
+        this._labelToIndex = {};
+
+        const originalData = this.getOriginalData();
+        if (originalData == null) return;
+
+        /**/
+        var {nodes,edges} = originalData;
+        const { maxNodes , subgraph, colorNodes } = this.getProperties();
+
+        const subgraphId = nodes.find((d)=>d.label == subgraph)?.id;
+        const subgraphIsActive = (subgraphId != null);
+
+        var {nodes,edges} = this.#filterData();
+
+        const willCalculateFilters = typeof(maxNodes) == 'number' && Array.isArray(nodes) && nodes.length > 0;
+
+        if (willCalculateFilters){
+            const filteredNodes = nodes;
+            const {minWeight, minValue, count} = shrink.findOptimalFilters(filteredNodes, maxNodes, this.getProperties());
+            if (count != null) console.log(`Map Shrink: Nodes:'${count}', MinWeight:'${minWeight}', MinValue:'${minValue}'`);
+            this.properties.filterMinWeight = minWeight;
+            this.properties.filterMinValue = minValue;
+            var {nodes,edges} = this.#filterData();
+        }
+
+        this._nodes = nodes;
+        this._edges = edges;
+
+        this.#processNeighbors();
+        
+        this._processNodes(nodes);
 
         // Neighbors List
         const neighbors = this._neighbors;
@@ -258,6 +447,18 @@ getNodeInfoByLabel(label)
         Object.keys(neighbors).forEach((id)=>{
             neighbors[id] = Array.from(neighbors[id]);
         });
+    }
+
+    belongsToActiveGroup(nodeGroups, filterGroups){
+        if (!Array.isArray(nodeGroups)) return filterGroups.has(nodeGroups);
+
+        for (let i = 0; i < nodeGroups.length; i++) {
+            const group = nodeGroups[i];
+            const belongs = filterGroups.has(group);
+            if (belongs) return true;
+        }
+
+        return false;
     }
 
     #filterData(){
@@ -294,7 +495,8 @@ getNodeInfoByLabel(label)
             DigitalTwinProcessing.normalizeNodeInfo(node);
             const {group,id,value,label,weight} = node;
     
-            if (groupFilterIsActive && !groups.has(group)) continue;
+            //if (groupFilterIsActive && !groups.has(group)) continue;
+            if (groupFilterIsActive && !this.belongsToActiveGroup(group, groups)) continue;
             if (valueFilterIsActive && value < filterMinValue) continue;
             if (weightFilterIsActive && weight < filterMinWeight) continue;
             if (onlyCompounds && !DigitalTwinProcessing.isCompound(label)) continue;

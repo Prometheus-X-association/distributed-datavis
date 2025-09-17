@@ -2,9 +2,38 @@
 
 # Release Notes
 
-v0.3.X (Next Release)
-* Complete Integration of Graph Series Visualizer.
+v0.4.X (Next Release)
 * More detailed guides and documentation of each class.
+
+v0.4.0
+* Completely new structure for sources in DigitalTwin / KnowledgeGraph content.
+* Automatic normalization mechanisms to ensure retrocompatibility.
+
+v0.3.8
+* HotFix: getMaxGroup()
+* HotFix: Custom colors and highlight
+
+v0.3.7
+* rules.json can be injected via URL
+
+v0.3.6
+* Highlight neighbors in a Graph.
+* Color neighbors in a Graph.
+* Added default flat color scaling for highlighted custom groups in a Graph.
+
+v0.3.5
+* Complete integration with Graph Series
+* New mechanism to dynamically add groups to a WordMap, defining also color
+* Added subtitle support to the visualizations
+* BugFix: error normalizing parameters based on Arrays.
+
+v0.3.4
+* BuildRules from different JSON formats
+* Improved HexagonMapWithTimeSeries
+* Automated coloring for Series with signals
+
+v0.3.3
+* Supports graphs where nodes can belong to more than 1 group.
 
 v0.3.2
 * HotFix: Bad references to the current Visualization

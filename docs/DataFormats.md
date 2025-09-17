@@ -23,9 +23,9 @@ We have defined a Standard Data Format to represent Graphs, defining some genera
 * **id:** Unique numerical value that identifies each Node
 * **value:** Numerical value that can describe a particular aspect of the node, such as importance, intensity or frequecy.
 * **label:** Textual value that describes a particula aspect of the node, such as its name.
-* **group:** This attribute can be used to clasify nodes into different groups.
+* **group:** This attribute can be used to clasify nodes into different groups. It can be a simple string with the group identifier, or a list of group identifiers.
 * **weight:** How descriptive the word / topic is. Small number means generic / fuzzy topic, bigger number means a descriptive topic.
-* **sources:** List of References to the sources of a node.
+* **sources:** List of References (ids) to the sources associated with the node.
 
 Parameters marked with an asterisk (*) are mandatory.
 
@@ -34,14 +34,15 @@ Node = {
     "id"(*) : Number,
     "value"(*) : Number,
     "label"(*) : String,
-    "group"(*) : String,
+    "group"(*) : String | Array<String>,
     "weight" : Number,
-    "sources" : Array<Source>,
+    "sources" : Array<Number>,
 }
 
 Source = {
     "title"(*) : String,
     "url"(*) : String,
+    "id"(*) : Number,
 }
 ```
 
@@ -53,11 +54,16 @@ Source = {
     "group": "1",
     "weight": 5,
     "sources": [
-        {
-            "title":"Data Science (Wikipedia)",
-            "url":"https://en.wikipedia.org/wiki/Data_science",
-        }
+        1
     ]
+}
+```
+
+```json
+{
+    "id": 11,
+    "title":"Data Science (Wikipedia)",
+    "url":"https://en.wikipedia.org/wiki/Data_science",
 }
 ```
 
@@ -119,6 +125,7 @@ Example:
         "nodes": Array<Node>,
         "edges": Array<Edge>,
         "legends": Legends,
+        "sources": Array<Source>
     }
 }
 ```
@@ -129,7 +136,7 @@ Example:
 {
     "data":{
         "nodes":[
-            {"id":1, "label":"Monkey", "group":1},
+            {"id":1, "label":"Monkey", "group":1, "sources":[1]},
             {"id":1, "label":"Panda", "group":1},
             {"id":1, "label":"Bambu", "group":2},
         ],
@@ -138,6 +145,12 @@ Example:
             {"from":1, "to":2},
             {"from":2, "to":3},
         ],
+
+        "sources":[{
+            "title":"Primate (Wikipedia)",
+            "url":"https://en.wikipedia.org/wiki/Primate",
+            "id": 1,
+        }],
 
         "legends":{
             "1":"Animals",

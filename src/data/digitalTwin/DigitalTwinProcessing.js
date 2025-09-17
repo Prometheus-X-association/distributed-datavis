@@ -33,6 +33,7 @@ function reduceMap(json, idsToPreserve){
 
 function normalizeMindMapJson(json){
     const normalized = {
+        ...json.data,
         info: json.info,
     }
 
@@ -128,7 +129,7 @@ function plotTypeIsCompatibleWithData(plotType, json){
       }
   
       return dataType;
-  }
+}
 
 function getCenterNode(nodes){
     const centerField = "search_center";
@@ -260,7 +261,7 @@ function sortArrayOfObjects(array, field){
 }
 
 function normalizeNodeInfo(node){
-    node.group = Number.parseInt(node.group);
+    if (typeof(node.group) == 'string') node.group = Number.parseInt(node.group);
 }
 
 const DigitalTwinProcessing = {

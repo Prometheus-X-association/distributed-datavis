@@ -71,9 +71,11 @@ function validateType(type, value){
 
 function validateArraySubType(subtype, array){
     for (let i = 0; i < array.length; i++) {
-        const newValue = array[i];
+        var newValue = array[i];
+        newValue = normalizePropertyValue(subtype,newValue);
         if (newValue == null) return false;
         if (!PropertiesUtils.validateType(subtype,newValue)) return false;
+        array[i] = newValue;
     }
     return true;
 }
@@ -150,6 +152,10 @@ function normalizePropertyValue(type,value){
             return "";
         case "dictionary":
             return {};
+        case "number":
+            value = Number.parseFloat(value)
+            if (isNaN(value)) value = null;
+            return value;
         default:
             return null;
     }

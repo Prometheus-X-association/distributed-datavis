@@ -8,8 +8,9 @@ const DEFAULT_RULES = { visuals : [] , properties : {} };
 
 function validateRules(rules){
     if (rules == null) return false;
-    if (!Array.isArray(rules.visuals)) return false;
-    if (rules.properties == null) return false;
+    if (!Array.isArray(rules?.visuals)) return false;
+    // Else
+    if (rules.properties == null) rules.properties = {};
     return true;
 }
 
@@ -18,6 +19,7 @@ class VisualizationSeries extends Component {
         width: 800,
         height: 600,
         titleHeight: 50,
+        subtitleHeight: 30,
         titleMargin: 10,
         buttonMargin: 10,
         buttonSize: 40,
@@ -75,17 +77,24 @@ class VisualizationSeries extends Component {
     calculateHeight(){
         var { 
             buttonSize , buttonMargin , height , titleHeight, fontSize,
-            showTitle, showButtons, titleMargin,
+            showTitle, showButtons, titleMargin, subtitleFontSize , subtitleHeight ,
         } = this.properties;
 
         var buttonsHeight;
         var titleFontSize;
+        var subtitleFontSize;
+
+        const noSubtitle = this.getCurrentSubtitle() == null;
+        if (noSubtitle) subtitleHeight = 0;
 
         if (showTitle == false){
             titleHeight = 0;
+            subtitleHeight = 0;
             titleFontSize = 0;
+            subtitleFontSize = 0;
         } else {
             titleFontSize = titleHeight - titleMargin*2 - 2; // -2 Reduces slightly the calculated size
+            subtitleFontSize = subtitleHeight - titleMargin - 2; // -2 Reduces slightly the calculated size
         }
 
         if (showButtons == false){
@@ -94,9 +103,12 @@ class VisualizationSeries extends Component {
             buttonsHeight = buttonSize + buttonMargin*2 + fontSize;
         }
         
-        var visualHeight = height - buttonsHeight - titleHeight;
+        var visualHeight = height - buttonsHeight - titleHeight - subtitleHeight;
         
-        return { buttonsHeight , visualHeight , titleHeight , titleFontSize };
+        return { 
+            buttonsHeight , visualHeight , titleHeight , titleFontSize ,
+            subtitleHeight , subtitleFontSize ,
+        };
     }
 
     _initVisuals(){
@@ -127,7 +139,8 @@ class VisualizationSeries extends Component {
         const { mainContainer } = this.components;
 
         const title = mainContainer.append('div').classed('visualTitle',true);
-        title.append('p').text('').style('text-align','center');
+        title.append('p').attr('class','visualMainTitle').text('').style('text-align','center');
+        title.append('p').attr('class','visualSubTitle').text('').style('text-align','center');
         
         const activeVisual = mainContainer.append('div').classed('activeVisual',true);
 
@@ -138,18 +151,37 @@ class VisualizationSeries extends Component {
         this.components.navButtons = navButtons;
     }
 
+    getCurrentTitle(){
+        return this.getActiveVisualInfo()?.title || null;
+    }
+
+    getCurrentSubtitle(){
+        return this.getActiveVisualInfo()?.subtitle || null;
+    }
+
     _refreshComponents(){
         super._refreshComponents();
         const { title , activeVisual , navButtons } = this.components;
-        const { buttonsHeight , visualHeight , titleHeight , titleFontSize } = this.calculateHeight()
+        const { 
+            buttonsHeight , visualHeight, 
+            titleHeight , titleFontSize, 
+            subtitleHeight, subtitleFontSize,
+        } = this.calculateHeight();
+
         const { width , titleMargin } = this.properties;
-        const visualInfo = this.getActiveVisualInfo();
-        const visualTitle = visualInfo?.title || '';
+        const visualTitle = this.getCurrentTitle() || '';
+        const visualSubtitle = this.getCurrentSubtitle() || '';
         
-        title.style('height', titleHeight)
-            .select('p')
+        title.style('height', titleHeight + subtitleHeight)
+            .select('p.visualMainTitle')
             .text(visualTitle)
             .style('font-size', titleFontSize)
+            .style('margin',0);
+
+        title.select('p.visualSubtitle')
+            .text(visualSubtitle)
+            .style('font-size', subtitleFontSize)
+            .style('color','gray')
             .style('margin',0);
         
         activeVisual.style('height', visualHeight);

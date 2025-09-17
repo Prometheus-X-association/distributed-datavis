@@ -130,7 +130,6 @@ function getButtonDetails(plot){
             action: ()=>{
                 LegendUtils.hideButtonsLegend(plot);
                 const groups = LegendUtils.getSelectedGroups(plot);
-                console.log({groups});
                 plot.setProperties({'filterGroups':groups});
                 plot.graphToMap.setProperties({'filterGroups':groups});
                 exitLegendSelection(plot);
@@ -185,6 +184,9 @@ function changeOnClickAction(plot, action){
     const onClick = (event) => recenterOnClick(event, This);
 
     switch (action) {
+        case 'none':
+            var actionOnClick = ()=>{};
+            break;
         case 'showdetails':
             var actionOnClick = showNodeDetails;
             TooltipUtils.enableTooltip(plot, true);
@@ -198,6 +200,7 @@ function changeOnClickAction(plot, action){
             break;
         case 'recenter':
             var actionOnClick = recenterOnClick;
+            plot.properties.mouseOver = true;
             break;
         case 'highlight':
             var actionOnClick = highlightOnClick;
@@ -479,7 +482,7 @@ function _highlightActionButton(plot){
     const buttonsDetails = getButtonDetails(plot);
     const action = plot.properties.actionOnClick;
 
-    const validActions = ['remove','highlight','recenter','source','showdetails','showrelations','showvalues'];
+    const validActions = ['remove','highlight','recenter','source','showdetails','showrelations','showvalues','none'];
     if (!validActions.includes(action)) return;
 
     const highlightColor = '#ffffff';
@@ -520,6 +523,7 @@ const interaction = {
     changeOnClickAction,
     initializeButtons,
     getButtonsSvg,
+    _highlightActionButton,
 }
 
 module.exports = interaction;

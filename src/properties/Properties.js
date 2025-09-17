@@ -89,7 +89,7 @@ class Properties {
         const rule = this.rules[key];
         if (rule == null) return value;
         const ruleType = rule.type;
-        return PropertiesUtils.normalizeValue(ruleType, value)
+        return PropertiesUtils.normalizeValue(ruleType, value);
     }
 
     _validateRuleType(key,value){
@@ -181,9 +181,12 @@ class Properties {
 
     #setterArray(key,newArray){
         const subtype = this.rules[key]?.subtype;
-        if (!PropertiesUtils.VALID_TYPES.includes(subtype)) return true;
-        const isValid = PropertiesUtils.validateArraySubType(subtype, newArray);
-        if (!isValid) return true;
+        if (subtype != null){
+            if (!PropertiesUtils.VALID_TYPES.includes(subtype)) return true;
+            const isValid = PropertiesUtils.validateArraySubType(subtype, newArray);
+            if (!isValid) return true;
+        }
+
         this.initializeProperty(key,newArray);
         return true;
     }

@@ -1,10 +1,11 @@
-import { GraphProcessor, GraphToMap } from "./GraphProcessor";
+import DigitalTwinProcessing from "./DigitalTwinProcessing";
+import GraphProcessor from "./GraphProcessor";
 
 import colors from "./colors";
 
 const digitalTwin = {
-    GraphProcessor,
-    GraphToMap,    
+    DigitalTwinProcessing,
+    GraphProcessor,  
     colors,
 }
 

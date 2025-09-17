@@ -2,8 +2,26 @@ const DEFAULT_COLORS_1_CATEGORY = ['#08233B'];
 const DEFAULT_COLORS_2_CATEGORIES = [];
 const DEFAULT_COLORS_3_CATEGORIES = ["#58C69A","#E59476","#4DC3F9"];
 
+function getDefaultColors(nCategories){
+    const colors = [];
+    if (typeof(nCategories) !== 'number') return [];
+
+    if (nCategories == 1) return DEFAULT_COLORS_1_CATEGORY;
+    if (nCategories == 3) return DEFAULT_COLORS_3_CATEGORIES;
+    
+    for (let i = 1; i <= nCategories; i++) {
+        colors.push('#000000');
+    }
+
+    return colors;
+}
+
 function setColorsToMindMap(plot){
     if (plot == null) return;
+
+    const customColors = Object.keys(plot.digitalTwin.properties.extraColorMaping);
+    if (customColors.length > 0) return;
+
     const colors = generateColorsForPlot(plot);
     plot.setColors(colors);
 }
@@ -23,9 +41,13 @@ function generateColorsForPlot(plot){
     });
 
     plot.getData().forEach(node => {
-        const group = node[groupField];
-        if (!categoryCount.hasOwnProperty(group)){console.log(`Warning at SetColors() : Group '${group}' was not correctly identified`); return;}
-        categoryCount[group] += 1;
+        var groups = node[groupField];
+        if (!Array.isArray(groups)) groups = [groups];
+        for (let i = 0; i < groups.length; i++) {
+            const group = Number.parseFloat(groups[i]);
+            if (!categoryCount.hasOwnProperty(group)){console.log(`Warning at SetColors() : Group '${group}' was not correctly identified`); continue;}
+            categoryCount[group] += 1;    
+        }
     });
 
     const nCategories = categories.length;
@@ -113,7 +135,7 @@ function setSDGColorsInMap(plot){
     plot.setLegend(legend);
 }
 
-function configureMapWithTimeSeries(plot) {
+function configureMapWithSignals(plot) {
     var colors = [
         "#001773", // (1) Emerging
         "#6987ff", // (2) Constantly Increasing
@@ -145,7 +167,8 @@ const colors = {
     setSDGColorsInMap,
     setColorsToMindMap,
     generateColorsForPlot,
-    configureMapWithTimeSeries,
+    configureMapWithSignals,
+    getDefaultColors,
 }
 
 module.exports = colors;

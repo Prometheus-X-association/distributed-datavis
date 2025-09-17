@@ -54,7 +54,7 @@ function sortNodes(nodes){
     return sorted;
 }
 
-function findOptimalFilters(nodes, desiredSize){
+function findOptimalFilters(nodes, desiredSize, filters){
     if (typeof(desiredSize) !== 'number') return {};
     if (!Array.isArray(nodes) || nodes.length == 0) return {};
     if (desiredSize <= 0 ) return  {'minWeight':null, 'minValue':null, 'count':null};
@@ -70,7 +70,17 @@ function findOptimalFilters(nodes, desiredSize){
         return {};
     }
 
-    const minWeights = [1,2,3,4,5];
+    var {
+        filterMinWeight,
+        filterMinValue
+    } = filters;
+
+    if (![1,2,3,4,5].includes(filterMinWeight)) filterMinWeight = 1;
+    var minWeights = [];
+    for (let i = filterMinWeight; i <= 5; i++) {
+        minWeights.push(i);
+    }
+
     var selectedMinValue = null;
     var selectedMinWeight = null;
     var selectedDifference = null;

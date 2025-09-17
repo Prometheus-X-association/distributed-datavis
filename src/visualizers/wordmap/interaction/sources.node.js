@@ -18,7 +18,7 @@ function showSourceData(plot, nodeId, page){
     const data = plot.digitalTwin.getNodeInfoById(nodeId);
     if (data.id != nodeId){ console.log('Warning at showSourceData() : Id is not consistant'); return;}
     if (!data.hasOwnProperty(sourceField)) return;
-    const sources = data[sourceField];
+    const sources = plot.digitalTwin.getSources(nodeId);
     if (!Array.isArray(sources)) return;
 
     const startIndex = (page - 1) * RESULTS_PER_PAGE;
