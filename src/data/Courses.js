@@ -25,7 +25,8 @@ function processCompassHeadai(data){
         'recommendations_based_on_extensive_skills',
         'recommendations_based_on_match',
         'recommendations_based_on_learning_paths',
-        'recommendations_based_on_skills_demand'
+        'recommendations_based_on_skills_demand',
+        'recommendations_based_on_matching_skills'
     ];
 
     keys.forEach(key => {

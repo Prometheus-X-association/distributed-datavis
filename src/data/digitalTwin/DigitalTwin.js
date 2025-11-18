@@ -361,6 +361,12 @@ getNodeInfoByLabel(label)
 
         const nodes = originalData?.data?.nodes || originalData?.nodes || [];
 
+        // HotFix for corrupted JSONs (BuildSignals)
+        // Nodes have latest structure for sources (Array of ids) but source information is missing
+        if (nodes.length > 0 && nodes[0].sources == null) return;
+        if (nodes.length > 0 && nodes[0].sources.length > 0 && typeof(nodes[0].sources[0]) === "number") return;
+        //
+
         const sourceContentToId = {};
         var nextSourceId = 0;
 

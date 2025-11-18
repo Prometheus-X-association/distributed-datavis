@@ -1,0 +1,110 @@
+<script src="http://localhost:8080/ptx-ddv.js"></script>
+
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src='https://d3js.org/d3-hexbin.v0.2.min.js'></script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<div id="ddv"></div>
+
+<script>
+const minimalGraph = {
+    data: {
+        nodes: [
+            {id:10, label:"Machine Learning", value:20, group:2,},
+            {id:11, label:"Artificial Intelligence", value:110, group:1},
+            {id:12, label:"Data Science", value:150, group:1},
+            {id:14, label:"Python", value:60, group:1}, 
+            {id:15, label:"Data Extraction", value:40, group:1},
+            {id:16, label:"Data Storage", value:30 , group:1}, 
+            {id:17, label:"PowerBI Reports", value:40, group:1},
+            {id:18, label:"Dashboards", value:125, group:1},
+            {id:20, label:"Programming", value:65, group:1},
+            {id:21, label:"Natural Language Processing", value:12, group:2},
+            {id:22, label:"Language Models", value:18, group:2}, 
+            {id:50, label:"Business Oriented",value:10, group:3} 
+        ],
+
+        edges: [
+            {from:12, to:10},{from:10, to:12},
+            {from:12, to:11},{from:11,to:12},
+            {from:12, to:14},{from:14,to:12},
+            {from:12, to:15},{from:15,to:12},
+            {from:12, to:16},{from:16,to:12},
+            {from:12, to:17},{from:17,to:12},
+            {from:12, to:18},{from:18,to:12},
+            {from:12, to:20},{from:20,to:12},
+            {from:12, to:21},{from:21,to:12},
+            {from:12, to:22},{from:22,to:12},
+
+            {from:10, to:14},{from:14,to:10},
+            {from:17, to:18},{from:18,to:17},
+            {from:14, to:21},{from:21,to:14},
+            {from:20, to:22},{from:22,to:20},
+            {from:11, to:10},{from:10,to:11},
+            {from:15, to:16},{from:16,to:15},
+
+            {from:18,to:50},{from:50,to:18}
+        ],
+
+        legends: {
+            "1":"Group 1",
+            "2":"Group 2",
+            "3":"Group 3",
+        }
+    }
+};
+
+
+const rules = {
+    "visuals": [
+        {
+            type: "HexagonMap",
+            data: minimalGraph,
+            properties: {"figSize":60,'backgroundColor':'gray'},
+            title: "Skills Profile",
+            buttonTitle: "Skills",
+        }
+    ],
+
+    "properties" : {
+        "fontSize": 14,
+        "fontFamily": "Arial",
+        'backgroundColor':'gray',
+    }
+}
+
+/** Alternative rules configuration if data is accesible via URL **/
+/**
+
+const rules = {
+    "visuals": [
+        {
+            type: "HexagonMap",
+            url: "INSERT_HERE_YOUR_URL",
+            properties: {"figSize":60,'backgroundColor':'gray'},
+            title: "Skills Profile",
+            buttonTitle: "Skills",
+        }
+    ],
+
+    "properties" : {
+        "fontSize": 14,
+        "fontFamily": "Arial",
+        'backgroundColor':'gray',
+    }
+}
+
+**/
+
+
+const visualization = new ddv.visualizers.VisualizationSeries(rules);
+visualization.attachOn('div#ddv');
+ddv.visualizers.responsive.enableResponsivenessToSeries(visualization);
+visualization.refresh();
+
+</script>
