@@ -5,4 +5,13 @@ services:
     build: .
     ports:
       - "8080:8080"
-    command: ["npx", "webpack-cli", "serve", "--mode", "production"]
+    restart: unless-stopped
+  
+  # Test suite: docker compose run --rm tests
+  tests:
+    build:
+      context: .
+      target: build
+    command: ["npm", "test"]
+    # The profile keeps it out of `docker compose up`.
+    profiles: ["test"]

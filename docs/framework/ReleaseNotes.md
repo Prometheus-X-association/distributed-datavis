@@ -2,6 +2,12 @@
 
 # Release Notes
 
+v0.5.2
+* Improved containerization and automated tests.
+* Added documentation files (MAINTAINERS, SECURITY)
+* Fixed vulnerabilities reported by npm audit.
+* Added performance tests.
+
 v0.5.1
 * Updated dependencies to fix reported vulnerabilities.
 * Minor improvements in automated tests and in containerization.

@@ -4,3 +4,6 @@ test*.html
 node_modules/
 license-info.json
 _tmp_
+
+# Sonarqube
+.scannerwork/

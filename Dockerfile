@@ -1,4 +1,8 @@
-FROM node:25-alpine
+# ------------------------------------------------------------------
+# STAGE 1 : Build the app
+# ------------------------------------------------------------------
+
+FROM node:25-alpine AS build
 
 # Set working directory
 WORKDIR /app/
@@ -16,10 +20,25 @@ COPY __tests__ ./__tests__
 COPY __mocks__ ./__mocks__
 COPY webpack.config.cjs jest.config.cjs /app/
 
-# Expose the port Webpack will serve on
-EXPOSE 8080
 
 RUN npm run build
 
-# Run Webpack Dev Server
-CMD ["npx", "webpack-cli", "serve", "--mode", "production"]
+
+# ------------------------------------------------------------------
+# STAGE 2 : Serve the app
+# ------------------------------------------------------------------
+
+FROM nginxinc/nginx-unprivileged:stable-alpine AS production
+COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=build /app/dist/ /usr/share/nginx/ddv/
+COPY --from=build /app/test/ /usr/share/nginx/ddv/test/
+
+# Explicit non-root user (uid 101 is the image's nginx user)
+USER 101
+
+EXPOSE 8080
+ 
+# Container health: checks the /health endpoint every 30 seconds
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -q -O /dev/null http://127.0.0.1:8080/health || exit 1
